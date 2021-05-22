@@ -28,20 +28,21 @@ class DropboxApiTest {
     @Order(1)
     public void UploadTest() throws IOException {
         byte[] data = Files.readAllBytes(Paths.get(PATH_LOCAL_DATA_FILENAME));
-        Response response = given().
-                config(RestAssured.config().
-                        encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false))).
-                header("Authorization", "Bearer "+TOKEN).
-                header("Dropbox-API-Arg",
-                        "{\"mode\": \"add\"," +
-                         "\"autorename\": true," +
-                         "\"mute\": false," +
-                         "\"path\":" +"\"" + PATH_CLOUD_DATA_FILENAME +"\"," +
-                         "\"strict_conflict\": false}").
-                header("Content-Type", "application/octet-stream").
-                body(data).
-                when().
-                post("https://content.dropboxapi.com/2/files/upload");
+        given().
+            config(RestAssured.config().
+                    encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false))).
+            header("Authorization", "Bearer "+TOKEN).
+            header("Dropbox-API-Arg",
+                    "{\"mode\": \"add\"," +
+                     "\"autorename\": true," +
+                     "\"mute\": false," +
+                     "\"path\":" +"\"" + PATH_CLOUD_DATA_FILENAME +"\"," +
+                     "\"strict_conflict\": false}").
+            header("Content-Type", "application/octet-stream").
+            body(data).
+            when().
+            post("https://content.dropboxapi.com/2/files/upload").
+            then().statusCode(200);
     }
 
     @Test
@@ -66,15 +67,15 @@ class DropboxApiTest {
         JSONObject requestBody = new JSONObject();
         requestBody.put("file", fileId);
         requestBody.put("actions", new ArrayList());
-        Response response = RestAssured.given().
-                config(RestAssured.config().
-                        encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false))).
-                header("Authorization", "Bearer "+TOKEN).
-                header("Content-Type", "application/json").
-                body(requestBody.toJSONString()).
-                when().
-                post("https://api.dropboxapi.com/2/sharing/get_file_metadata");
-        assertEquals(200, response.getStatusCode());
+        RestAssured.given().
+            config(RestAssured.config().
+                    encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false))).
+            header("Authorization", "Bearer "+TOKEN).
+            header("Content-Type", "application/json").
+            body(requestBody.toJSONString()).
+            when().
+            post("https://api.dropboxapi.com/2/sharing/get_file_metadata").
+            then().statusCode(200);
     }
 
     @Test
@@ -82,15 +83,15 @@ class DropboxApiTest {
     public void DeleteFileTest() {
         JSONObject requestBody = new JSONObject();
         requestBody.put("path", PATH_CLOUD_DATA_FILENAME);
-        Response response = given().
-                config(RestAssured.config().
-                        encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false))).
-                header("Authorization", "Bearer " + TOKEN).
-                header("Content-Type", "application/json").
-                body(requestBody.toJSONString()).
-                when().
-                post("https://api.dropboxapi.com/2/files/delete_v2");
-        assertEquals(200, response.getStatusCode());
+        given().
+            config(RestAssured.config().
+                    encoderConfig(encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false))).
+            header("Authorization", "Bearer " + TOKEN).
+            header("Content-Type", "application/json").
+            body(requestBody.toJSONString()).
+            when().
+            post("https://api.dropboxapi.com/2/files/delete_v2").
+            then().statusCode(200);
 
     }
 }
